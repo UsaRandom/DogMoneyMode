@@ -5,9 +5,6 @@ Browser extension that automatically converts fiat prices to display in Dogecoin
 
 Press 'Very Money' to convert Fiat prices to Dogecoin prices right in the tab.
 
-![image](https://github.com/UsaRandom/DogMoneyMode/assets/2897796/bc9142fc-8ed3-470d-b849-426e69ea3183)
-
-
 (the price of dogecoin itself is updated every 2 minutes)
 
 ### Much Auto!
