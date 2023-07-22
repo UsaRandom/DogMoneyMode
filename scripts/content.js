@@ -79,31 +79,32 @@ function convertPrices() {
             // Amazon-specific logic here
             var priceElements = document.querySelectorAll('.a-price');
             priceElements.forEach(function(priceElement) {
-
                 if(!priceElement.textContent.includes('Ð')){
                     var offscreenElement = priceElement.querySelector('.a-offscreen');
                     var visiblePriceElements = priceElement.querySelectorAll('.a-price-whole, .a-price-fraction');
                     var currencySymbolElement = priceElement.querySelector('.a-price-symbol');
-            
+
                     if (offscreenElement && visiblePriceElements.length > 0) {
-                        var fiat = offscreenElement.textContent.replace(fiat_currency_symbol, '');
+                        // Remove currency symbol and commas before conversion to float
+                        var fiat = offscreenElement.textContent.replace(fiat_currency_symbol, '').replace(/,/g, '');
                         var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
-                                                                                                    minimumFractionDigits: 2,
-                                                                                                    maximumFractionDigits: 2
-                                                                                                });
-            
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2
+                                                                    });
+
                         offscreenElement.textContent = 'Ð' + dogefy;
-            
+
                         if (currencySymbolElement) {
                             currencySymbolElement.textContent = 'Ð';
                         }
-            
+
                         var [whole, fraction] = dogefy.split('.');
                         visiblePriceElements[0].textContent = whole + visiblePriceElements[0].querySelector('.a-price-decimal').textContent;
                         visiblePriceElements[1].textContent = fraction;
                     }
                 }
             });
+
 
             document.querySelectorAll('span[id="sns-base-price"]').forEach(function(node) {
                 var text = node.textContent;
