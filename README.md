@@ -1,7 +1,7 @@
 ![image](https://github.com/mstauber/DogMoneyMode/assets/2897796/f932a886-7b03-4448-adaa-8beb074b79f7)
 
 # DogMoneyMode
-Browser extension that automatically converts fiat prices to Dogecoin. Supports Telsa, Amazon, eBay, Walmart, and most other sites. Fiat Supported: USD, GBP, and EUR.
+Browser extension that automatically converts fiat prices to display in Dogecoin. Supports Telsa, Amazon, eBay, Walmart, and most other sites. Fiat Supported: USD, GBP, and EUR.
 
 Press 'Very Money' to convert Fiat prices to Dogecoin prices right in the tab.
 
