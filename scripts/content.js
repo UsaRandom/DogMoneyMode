@@ -87,7 +87,7 @@ function convertPrices() {
             
                     if (offscreenElement && visiblePriceElements.length > 0) {
                         var fiat = offscreenElement.textContent.replace(fiat_currency_symbol, '');
-                        var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toFixed(2);
+                        var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en');
             
                         offscreenElement.textContent = 'Ð' + dogefy;
             
@@ -105,18 +105,24 @@ function convertPrices() {
             document.querySelectorAll('span[id="sns-base-price"]').forEach(function(node) {
                 var text = node.textContent;
                 var matches = text.match(regex);
-        
+            
                 if (matches) {
                     var newTextNode = node.cloneNode(); // clone the node to avoid modifying the original while iterating
                     for (var i = 0; i < matches.length; i++) {
-                        var fiat = matches[i].match(/[\d\.]+/)[0];
-                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (parseFloat(fiat) / parseFloat(dogecoinValue)).toFixed(2));
+                        // Adjust the fiat extraction pattern to include commas
+                        var fiat = matches[i].match(/[\d,\.]+/)[0];
+            
+                        // Remove commas before converting to float
+                        var fiatValue = parseFloat(fiat.replace(/,/g, ''));
+            
+                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en'));
                         text = dogefy;
                     }
                     newTextNode.textContent = text;
                     node.parentNode.replaceChild(newTextNode, node); // replace the old node with the new one
                 }
             });
+            
         }     
 
 
@@ -125,27 +131,34 @@ function convertPrices() {
         This logic replaces most fiat prices on the screen.
 
         */
+
         document.querySelectorAll('*').forEach(function(node) {
-            
-            if (node.children.length === 0) { // only process leaf nodes
-                var text = node.textContent;
+            if (node.children.length === 0 || (node.children.length > 0 && !node.children[0].children.length)) { // process leaf nodes and nodes with only children but no grandchildren
+                var text = node.innerHTML; 
                 var matches = text.match(regex);
-            
+        
                 if (matches) {
                     var newTextNode = node.cloneNode(); // clone the node to avoid modifying the original while iterating
-            
+        
                     for (var i = 0; i < matches.length; i++) {
-                        var fiat = matches[i].match(/[\d\.]+/)[0];
-                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (parseFloat(fiat) / parseFloat(dogecoinValue)).toFixed(2));
+                        // Adjust the fiat extraction pattern to include commas
+                        var fiat = matches[i].match(/[\d,\.]+/)[0];
+        
+                        // Remove commas before converting to float
+                        var fiatValue = parseFloat(fiat.replace(/,/g, ''));
+        
+                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en'));
                         text = dogefy;
                     }
-            
-                    newTextNode.textContent = text;
+        
+                    newTextNode.innerHTML = text;
                     node.parentNode.replaceChild(newTextNode, node); // replace the old node with the new one
                 }
             }
-            
         });
+        
+        
+
         
     });
     startInterval();
