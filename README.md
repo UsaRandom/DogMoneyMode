@@ -10,7 +10,7 @@ Press 'Very Money' to convert Fiat prices to Dogecoin prices right in the tab.
 ### Much Auto!
 Enable 'auto' to automatically convert fiat prices to dogecoin every 2.5 seconds.
 
-![2023-07-21-21-44-34](https://github.com/mstauber/DogMoneyMode/assets/2897796/534389a0-ce9e-4b74-a35f-ffc07fdc1bd3)
+![output-onlinegiftools](https://github.com/mstauber/DogMoneyMode/assets/2897796/4907b0f4-ba41-455a-9144-0f5ce61da743)
 
 
 # Install
