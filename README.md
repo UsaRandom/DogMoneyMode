@@ -3,8 +3,6 @@
 # DogMoneyMode
 Browser extension that automatically converts fiat prices to Dogecoin. Supports Amazon, eBay, and most sites. Fiat Supported: USD, GBP, and EUR.
 
-![image](https://github.com/mstauber/DogMoneyMode/assets/2897796/d760bd6f-a8bc-47f6-bc64-9871e6908899)
-
 Press 'Very Money' to convert Fiat prices to Dogecoin prices right in the tab.
 
 (the price of dogecoin itself is updated every 2 minutes)
