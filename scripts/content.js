@@ -87,7 +87,10 @@ function convertPrices() {
             
                     if (offscreenElement && visiblePriceElements.length > 0) {
                         var fiat = offscreenElement.textContent.replace(fiat_currency_symbol, '');
-                        var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en');
+                        var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
+                                                                                                    minimumFractionDigits: 2,
+                                                                                                    maximumFractionDigits: 2
+                                                                                                });
             
                         offscreenElement.textContent = 'Ð' + dogefy;
             
@@ -115,7 +118,10 @@ function convertPrices() {
                         // Remove commas before converting to float
                         var fiatValue = parseFloat(fiat.replace(/,/g, ''));
             
-                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en'));
+                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en', {
+                                                                                                                            minimumFractionDigits: 2,
+                                                                                                                            maximumFractionDigits: 2
+                                                                                                                        }));
                         text = dogefy;
                     }
                     newTextNode.textContent = text;
@@ -128,17 +134,25 @@ function convertPrices() {
 
         /*
 
-        This logic replaces most fiat prices on the screen.
+        This logic replaces most fiat prices on the web.
 
         */
 
         document.querySelectorAll('*').forEach(function(node) {
-            if (node.children.length === 0 || (node.children.length > 0 && !node.children[0].children.length)) { // process leaf nodes and nodes with only children but no grandchildren
+            var isEligibleNode = node.children.length === 0; // Process leaf nodes
+        
+            if (!isEligibleNode && node.children.length > 0) { // Check for nodes with only children but no grandchildren
+                isEligibleNode = Array.from(node.children).every(function(child) {
+                    return !child.children.length && (child.tagName.toLowerCase() === 'br' || child.tagName.toLowerCase() === 'span');
+                });
+            }
+        
+            if (isEligibleNode) { 
                 var text = node.innerHTML; 
                 var matches = text.match(regex);
         
                 if (matches) {
-                    var newTextNode = node.cloneNode(); // clone the node to avoid modifying the original while iterating
+                    var newTextNode = node.cloneNode(); // Clone the node to avoid modifying the original while iterating
         
                     for (var i = 0; i < matches.length; i++) {
                         // Adjust the fiat extraction pattern to include commas
@@ -147,12 +161,15 @@ function convertPrices() {
                         // Remove commas before converting to float
                         var fiatValue = parseFloat(fiat.replace(/,/g, ''));
         
-                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en'));
+                        var dogefy = text.replace(fiat_currency_symbol + fiat, 'Ð' + (fiatValue / parseFloat(dogecoinValue)).toLocaleString('en', {
+                                                                                                                                minimumFractionDigits: 2,
+                                                                                                                                maximumFractionDigits: 2
+                                                                                                                            }));
                         text = dogefy;
                     }
         
                     newTextNode.innerHTML = text;
-                    node.parentNode.replaceChild(newTextNode, node); // replace the old node with the new one
+                    node.parentNode.replaceChild(newTextNode, node); // Replace the old node with the new one
                 }
             }
         });

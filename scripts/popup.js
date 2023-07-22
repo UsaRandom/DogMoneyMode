@@ -100,7 +100,7 @@ document.getElementById('run').addEventListener('click', function() {
         fiat_currency_symbol = items.fiat_currency_symbol;
 
         select.value = items.fiat_currency + ',' + items.fiat_currency_symbol;
-        updatePrice();
+        setTimeout(updatePrice(),70);
       }
     });
   
@@ -111,13 +111,13 @@ document.getElementById('run').addEventListener('click', function() {
 
       fiat_currency = selected_fiat_currency;
       fiat_currency_symbol = selected_fiat_currency_symbol;
-      updatePrice();
+      setTimeout(updatePrice(),70);
       chrome.storage.sync.set({
         fiat_currency: fiat_currency,
         fiat_currency_symbol: fiat_currency_symbol
       });
     });
 
-    updatePrice();
+    setTimeout(updatePrice(),70);
   });
   
