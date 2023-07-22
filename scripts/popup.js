@@ -17,10 +17,18 @@ document.getElementById('run').addEventListener('click', function() {
         document.getElementById("auto-refresh").checked = result.autoRefresh || false;
             
         document.getElementById("auto-refresh").addEventListener("change", function(e) {
-            chrome.storage.sync.set({'autoRefresh': e.target.checked}, function() {
-                console.log('Auto refresh is set to ' + e.target.checked);
-            });
-        });
+          chrome.storage.sync.set({'autoRefresh': e.target.checked}, function() {
+              console.log('Auto refresh is set to ' + e.target.checked);
+              
+              // If autoRefresh is enabled, send the "runScript" message.
+              if(e.target.checked) {
+                  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                      chrome.tabs.sendMessage(tabs[0].id, {action: "runScript"});
+                  });
+              }
+          });
+      });
+      
         
     });
 
@@ -32,7 +40,7 @@ document.getElementById('run').addEventListener('click', function() {
 
         chrome.storage.sync.get(['dogecoinTimestamp', 'dogecoinValue', 'fiat_currency'], function(result) {
             const storedTimestamp = result.dogecoinTimestamp;
-            dogecoinValue = result.dogecoinValue;
+            dogecoinValue = result.dogecoinValue ?? 0;
             let storedCurrency = result.fiat_currency;
             
                                     
@@ -47,7 +55,7 @@ document.getElementById('run').addEventListener('click', function() {
 
 
             // Fetch new value if there is no stored timestamp, it's more than 120 seconds old, or the currency has changed
-            if (!storedTimestamp || currentTimestamp - storedTimestamp > 120 || storedCurrency !== fiat_currency) {
+            if (dogecoinValue === 0 || !storedTimestamp || currentTimestamp - storedTimestamp > 120 || storedCurrency !== fiat_currency) {
                 fetch("https://api.coingecko.com/api/v3/simple/price?ids=dogecoin&vs_currencies=" + fiat_currency)
                     .then(response => response.json())
                     .then(data => {
@@ -109,5 +117,7 @@ document.getElementById('run').addEventListener('click', function() {
         fiat_currency_symbol: fiat_currency_symbol
       });
     });
+
+    updatePrice();
   });
   

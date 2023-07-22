@@ -164,5 +164,6 @@ chrome.storage.sync.get(['fiat_currency', 'fiat_currency_symbol'], function(item
             convertPrices();
         }
     });
-    convertPrices();
+    
+    startInterval();
 });
