@@ -1,123 +1,100 @@
 document.getElementById('run').addEventListener('click', function() {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {action: "runScript"});
+  notifyConvertPrices();
+});
+
+var fiat_currency = 'usd';
+var fiat_currency_symbol = '$';
+var dogecoinValue = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  chrome.storage.sync.get(['dogecoinValue', 'fiat_currency', 'fiat_currency_symbol'], function(result) {
+    dogecoinValue = result.dogecoinValue ?? 0;
+    fiat_currency = result.fiat_currency ?? 'usd';
+    fiat_currency_symbol = result.fiat_currency_symbol ?? '$';
+    
+    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+  });
+
+
+  chrome.storage.sync.get(['dogeAutoRefresh'], function(result) {
+    document.getElementById("auto-refresh").checked = result.dogeAutoRefresh || false;
+    document.getElementById("auto-refresh").addEventListener("change", function(e) {
+      chrome.storage.sync.set({'dogeAutoRefresh': e.target.checked}, function() {
+          notifyAutoChanged();
+      });
     });
   });
-  
-  var fiat_currency = 'usd';
-  var fiat_currency_symbol = '$';
-  var dogecoinValue = 0;
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var select = document.getElementById('currency-select');
 
 
-      // Auto-refresh button
-    chrome.storage.sync.get(['autoRefresh'], function(result) {
-        document.getElementById("auto-refresh").checked = result.autoRefresh || false;
-            
-        document.getElementById("auto-refresh").addEventListener("change", function(e) {
-          chrome.storage.sync.set({'autoRefresh': e.target.checked}, function() {
-              console.log('Auto refresh is set to ' + e.target.checked);
-              
-              // If autoRefresh is enabled, send the "runScript" message.
-              if(e.target.checked) {
-                  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                      chrome.tabs.sendMessage(tabs[0].id, {action: "runScript"});
-                  });
-              }
-          });
-      });
-      
-        
-    });
+  chrome.storage.sync.get(['fiat_currency', 'fiat_currency_symbol'], function(items) {
+    if (items.fiat_currency && items.fiat_currency_symbol) {
+      fiat_currency = items.fiat_currency;
+      fiat_currency_symbol = items.fiat_currency_symbol;
 
-
-    var updatePrice = function () {
-        
-        // Get the current Unix timestamp in seconds
-        const currentTimestamp = Math.floor(Date.now() / 1000);
-
-        chrome.storage.sync.get(['dogecoinTimestamp', 'dogecoinValue', 'fiat_currency'], function(result) {
-            const storedTimestamp = result.dogecoinTimestamp;
-            dogecoinValue = result.dogecoinValue ?? 0;
-            let storedCurrency = result.fiat_currency;
-            
-                                    
-            let formatter = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: fiat_currency,
-                minimumFractionDigits: 4,
-                maximumFractionDigits: 4
-            });
-
-            document.getElementById("fiat-price").textContent = formatter.format(dogecoinValue);
-
-
-            // Fetch new value if there is no stored timestamp, it's more than 120 seconds old, or the currency has changed
-            if (dogecoinValue === 0 || !storedTimestamp || currentTimestamp - storedTimestamp > 120 || storedCurrency !== fiat_currency) {
-                fetch("https://api.coingecko.com/api/v3/simple/price?ids=dogecoin&vs_currencies=" + fiat_currency)
-                    .then(response => response.json())
-                    .then(data => {
-                        dogecoinValue = data["dogecoin"][fiat_currency];
-                        chrome.storage.sync.set({
-                            'dogecoinValue': dogecoinValue, 
-                            'fiat_currency': fiat_currency
-                        }, function() {
-                            console.log('Dogecoin value is set to ' + dogecoinValue + ' ' + fiat_currency);
-                        });
-
-                        // Store the current timestamp
-                        chrome.storage.sync.set({'dogecoinTimestamp': currentTimestamp}, function() {
-                            console.log('Timestamp is set to ' + currentTimestamp);
-                        });
-
-                                    
-                        let formatter = new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: fiat_currency,
-                            minimumFractionDigits: 4,
-                            maximumFractionDigits: 4
-                        });
-
-                        document.getElementById("fiat-price").textContent = formatter.format(dogecoinValue);
-                    })
-                    .catch((error) => {
-                        console.log("Much Sadness! Can't get current value of Dogecoin. " + error);
-                    });
-            }
-
-
-        
-        });
+      select.value = items.fiat_currency + ',' + items.fiat_currency_symbol;
+      updatePrice();
     }
-
-    // Load the current currency from storage
-    chrome.storage.sync.get(['fiat_currency', 'fiat_currency_symbol'], function(items) {
-      if (items.fiat_currency && items.fiat_currency_symbol) {
-
-        fiat_currency = items.fiat_currency;
-        fiat_currency_symbol = items.fiat_currency_symbol;
-
-        select.value = items.fiat_currency + ',' + items.fiat_currency_symbol;
-        setTimeout(updatePrice(),70);
-      }
-    });
-  
-  
-    // Update the currency in storage whenever the selection changes
-    select.addEventListener('change', function() {
-      var [selected_fiat_currency, selected_fiat_currency_symbol] = select.value.split(',');
-
-      fiat_currency = selected_fiat_currency;
-      fiat_currency_symbol = selected_fiat_currency_symbol;
-      setTimeout(updatePrice(),70);
-      chrome.storage.sync.set({
-        fiat_currency: fiat_currency,
-        fiat_currency_symbol: fiat_currency_symbol
-      });
-    });
-
-    setTimeout(updatePrice(),70);
   });
-  
+
+
+  var select = document.getElementById('currency-select');
+
+  select.addEventListener('change', function() {
+    var [selected_fiat_currency, selected_fiat_currency_symbol] = select.value.split(',');
+    fiat_currency = selected_fiat_currency;
+    fiat_currency_symbol = selected_fiat_currency_symbol;
+    
+    chrome.storage.sync.set({
+      fiat_currency: fiat_currency,
+      fiat_currency_symbol: fiat_currency_symbol
+    });
+    forceUpdatePrice();  
+  });
+
+  updatePrice();
+});
+
+
+
+function notifyConvertPrices() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      action: "convertPrices",
+      currencySymbol: fiat_currency_symbol,
+      conversionPrice: dogecoinValue,
+      currencyCode: fiat_currency
+    });
+  });
+
+}
+
+function notifyAutoChanged() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      action: "autoChanged"
+    });
+  });
+}
+
+
+
+function forceUpdatePrice() {
+  chrome.runtime.sendMessage({command: "forceUpdatePrice"},function(response) {
+    dogecoinValue = response.dogecoinValue;
+    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+  });
+}
+
+function updatePrice() {
+  notifyUpdatePrice(function(response) {
+    dogecoinValue = response.dogecoinValue;
+    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+  });
+}
+
+function notifyUpdatePrice(callback) {
+  chrome.runtime.sendMessage({command: "updatePrice"}, callback);  
+}
+
+
