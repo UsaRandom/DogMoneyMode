@@ -1,10 +1,19 @@
-document.getElementById('run').addEventListener('click', function() {
-  notifyConvertPrices();
-});
-
 var fiat_currency = 'usd';
 var fiat_currency_symbol = '$';
 var dogecoinValue = 0;
+
+
+var tipsButton = document.getElementById('tips');
+var tipContent = document.getElementById('tip-content');
+
+tipsButton.addEventListener('click', function(event) {
+  event.preventDefault();
+  if (window.getComputedStyle(tipContent).display === 'none') {
+    tipContent.style.display = 'block';
+  } else {
+    tipContent.style.display = 'none';
+  }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -51,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     forceUpdatePrice();  
   });
+
 
   updatePrice();
 });

@@ -178,7 +178,7 @@ function runAutoDoge() {
     }
 }
 
-function autoChanged() {
+function autoChanged(firstRun) {
     chrome.runtime.sendMessage({command: "updatePrice"}).then(response => {
         if(response.error) {
           console.log("An error occurred: " + response.error);
@@ -192,6 +192,12 @@ function autoChanged() {
         return chrome.storage.sync.get(['dogeAutoRefresh']);
       }).then(result => {
         autoDoge = result.dogeAutoRefresh || false;
+
+        if(!firstRun && !autoDoge)
+        {
+            clearInterval(autoDogeInterval);
+            window.location.reload();
+        }
         runAutoDoge();
       }).catch(error => console.log('An error occurred:', error));
       
@@ -208,9 +214,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       convertPrices();
     }
     if(request.action == "autoChanged") {
-        autoChanged();
+        autoChanged(false);
     };
   });
 
 
-  autoChanged();
+  autoChanged(true);
