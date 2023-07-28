@@ -1,10 +1,12 @@
 {
     "manifest_version": 3,
     "name": "DogMoneyMode",
-    "version": "1.0",
-    "description": "Converts Fiat Prices to Dogecoin. Supports Amazon, eBay, and most sites. Fiat Supported: USD, GBP, and EUR.",
-  
-    "permissions": ["storage"],
+    "version": "1.1",
+    "description": "Browser extension that makes fiat prices display in Dogecoin. Fiat Supported: USD, GBP, and EUR. Automode may break some features on some websites. Dogecoin Tips: D6hbn1AugHq3WVtTVSv1fZAg6atPAMtwuV",
+    "background": {
+      "service_worker": "scripts/background.js"
+    },
+    "permissions": ["alarms", "storage"],
     "action": {
       "default_popup": "popup.html"
     },
