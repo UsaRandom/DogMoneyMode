@@ -1,6 +1,7 @@
 var fiat_currency = 'usd';
 var fiat_currency_symbol = "$";
 var dogecoinValue = 0.0774;
+var updateSpeed = 500;
 
 function convertToDogecoin(currencyStr, regexToMatch, conversionRate) {
     
@@ -173,7 +174,7 @@ function runAutoDoge() {
 
     if(autoDoge) {
         convertPrices();
-        autoDogeInterval = setInterval(runAutoDoge, 250);
+        autoDogeInterval = setInterval(runAutoDoge, updateSpeed);
     }
 }
 
