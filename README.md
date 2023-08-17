@@ -12,7 +12,7 @@ Browser extension that automatically converts fiat prices to display in Dogecoin
 ### Chrome & Edge
 
 You can add DogMoneyMode to Chrome and Edge via the chrome webstore.
-[Install via Chrome Webstore](https://chrome.google.com/webstore/detail/dogmoneymode/biohgaaeeifjpamlfinoloeomblpbnfm]
+[Install via Chrome Webstore](https://chrome.google.com/webstore/detail/dogmoneymode/biohgaaeeifjpamlfinoloeomblpbnfm)
 
 
 ### Chrome - Manual Install
