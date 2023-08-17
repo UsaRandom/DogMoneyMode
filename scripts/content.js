@@ -68,11 +68,17 @@ This logic replaces most fiat prices on the web.
 
 */
 
-function processNodesRecursively(node, regexToMatch, isAmazon) {
+function processNodesRecursively(node, regexToMatch, useInnerHtml) {
+
+    
+    // If this node is an input field or contenteditable, skip processing
+    if (node.tagName && node.tagName.toLowerCase() === 'input') return;
+    if (node.isContentEditable) return;
+
 
     // If this node has children, recursively process the children first
     if (node.children.length > 0) {
-        Array.from(node.children).forEach(child => processNodesRecursively(child, regexToMatch, isAmazon));
+        Array.from(node.children).forEach(child => processNodesRecursively(child, regexToMatch, useInnerHtml));
     }
     
     // Determine if this node is eligible for processing
@@ -93,8 +99,8 @@ function processNodesRecursively(node, regexToMatch, isAmazon) {
     if(isEligibleNode) {
         let result;
 
-        if(node.children.length > 0 || isAmazon){
-            if(onlyDecorations && !isAmazon) {
+        if(node.children.length > 0 || useInnerHtml){
+            if(onlyDecorations && !useInnerHtml) {
                 result = processMatches(node.textContent, regexToMatch);
                 if (result.replaced) {
                     node.textContent = result.text;
@@ -117,13 +123,13 @@ function processNodesRecursively(node, regexToMatch, isAmazon) {
 function convertPrices() {
     var regex = createCurrencyRegex(fiat_currency_symbol);
 
-    var isAmazon = false;
+    var useInnerHtml = false;
 
     /*
         Amazon breaks prices up into many elements, it gets some custom logic.
     */
     if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
-        isAmazon = true;
+        useInnerHtml = true;
        var priceElements = document.querySelectorAll('.a-price');
         priceElements.forEach(function(priceElement) {
             if(!priceElement.textContent.includes('Ð')){
@@ -154,8 +160,65 @@ function convertPrices() {
 
     }
 
+    /* 
+        Newegg also breaks up prices into many elements, it also gets custom logic.
+    */
+   if (/^(www\.)?newegg\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
+        var priceElements = document.querySelectorAll('.price-current');
+        var goodsPriceElements = document.querySelectorAll('.goods-price-current');
+    
+        priceElements.forEach(function(priceElement) {
+            if(!priceElement.textContent.includes('Ð')){
+                var strongElement = priceElement.querySelector('strong');
+                var supElement = priceElement.querySelector('sup');
+                var dollarSymbolIndex = Array.from(priceElement.childNodes).findIndex(node => node.nodeType === 3 && node.nodeValue.includes('$'));
+        
+                if (strongElement && supElement && dollarSymbolIndex > -1) {
+                    var fiat = strongElement.textContent + '.' + supElement.textContent.replace(/,/g, '');
+                    var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+        
+                    var [whole, fraction] = dogefy.split('.');
+                    strongElement.textContent = whole;
+                    supElement.textContent = fraction;
+                    
+                    var textNode = priceElement.childNodes[dollarSymbolIndex];
+                    textNode.nodeValue = textNode.nodeValue.replace(fiat_currency_symbol, 'Ð');
+                }
+            }
+        });
+
+
+        goodsPriceElements.forEach(function(priceElement) {
+            if(!priceElement.textContent.includes('Ð')){
+                var strongElement = priceElement.querySelector('.goods-price-value strong');
+                var supElement = priceElement.querySelector('.goods-price-value sup');
+                var currencySymbolElement = priceElement.querySelector('.goods-price-symbol');
+
+                if (strongElement && supElement) {
+                    var fiat = strongElement.textContent + '.' + supElement.textContent.replace(/,/g, '');
+                    var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    var [whole, fraction] = dogefy.split('.');
+                    strongElement.textContent = whole;
+                    supElement.textContent = fraction;
+
+                    if (currencySymbolElement) {
+                        currencySymbolElement.textContent = 'Ð';
+                    }
+                }            
+            }
+        });
+    }
+    
+
     // Start processing at the body tag
-    processNodesRecursively(document.body, regex, isAmazon);
+    processNodesRecursively(document.body, regex, useInnerHtml);
 }
 
 
