@@ -30,16 +30,4 @@ Browser extension that automatically converts fiat prices to display in Dogecoin
 6. The extension should now be loaded into Edge.
 
 
-### Firefox
-
-**WARNING: Firefox will unload the extension every time it is closed.**
-
-1. Download the extension files and place them in a folder on your computer.
-2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
-3. Click "Load Temporary Add-on...".
-4. Navigate to any file inside the extension folder and click "Open".
-5. The extension should now be loaded into Firefox. Note that Firefox will unload your extension every time it is closed. To keep it installed permanently, you'll need to get it signed by Mozilla.
-
-
-
-Greatly Inspired by https://github.com/qlpqlp/dogefy
+Inspired by https://github.com/qlpqlp/dogefy
