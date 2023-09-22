@@ -51,11 +51,20 @@ function processMatches(text, regexToMatch) {
         // process the longest match
         var dogecoinAmount = convertToDogecoin(longestMatch, regexToMatch, dogecoinValue);
         if (dogecoinAmount !== null) {
-            text = text.replace(longestMatch, `Ð${dogecoinAmount.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })}`);
+            var fractionDigitsOptions = {};
+
+            //only show decimal points if we have less than 1000
+            if (dogecoinAmount < 1000) {
+                fractionDigitsOptions.minimumFractionDigits = 2;
+                fractionDigitsOptions.maximumFractionDigits = 2;
+            } else {
+                fractionDigitsOptions.minimumFractionDigits = 0;
+                fractionDigitsOptions.maximumFractionDigits = 0;
+            }
+            text = text.replace(longestMatch, `Ð${dogecoinAmount.toLocaleString('en-US', fractionDigitsOptions)}`);
             replaced = true;
         }
+
     }
 
     return {text, replaced};
