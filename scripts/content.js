@@ -226,6 +226,11 @@ function updateView() {
             document.documentElement.classList.add("dogmoneymode-comic-sans");
         }
     }
+    else {
+        if (document.documentElement.classList.contains("dogmoneymode-comic-sans")) {
+            document.documentElement.classList.remove("dogmoneymode-comic-sans");
+        }
+    }
     
     
     updateViewInterval = setInterval(updateView, updateSpeed);
