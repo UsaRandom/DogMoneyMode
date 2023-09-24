@@ -3,6 +3,12 @@ var fiat_currency_symbol = "$";
 var dogecoinValue = 0.0774;
 var updateSpeed = 500;
 
+var runDogMoneyMode = false;
+var updateViewInterval = null;
+
+var comicMode = false;
+
+
 function convertToDogecoin(currencyStr, regexToMatch, conversionRate) {
     
     //if we don't clone the regex we can have issues
@@ -206,21 +212,18 @@ function convertPrices() {
 
 
 
-var autoDoge = false;
-var autoDogeInterval = null;
 
 
+function updateView() {
+    clearInterval(updateViewInterval);
 
-function runAutoDoge() {
-    clearInterval(autoDogeInterval);
-
-    if(autoDoge) {
+    if(runDogMoneyMode) {
         convertPrices();
-        autoDogeInterval = setInterval(runAutoDoge, updateSpeed);
+        updateViewInterval = setInterval(updateView, updateSpeed);
     }
 }
 
-function autoChanged(firstRun) {
+function updateState(firstRun) {
     chrome.runtime.sendMessage({command: "updatePrice"}).then(response => {
         if(response.error) {
           console.log("An error occurred: " + response.error);
@@ -231,16 +234,21 @@ function autoChanged(firstRun) {
         fiat_currency = response.fiat_currency ?? 'usd';
         fiat_currency_symbol = response.fiat_currency_symbol ?? '$';
         
-        return chrome.storage.sync.get(['dogeAutoRefresh']);
+        return chrome.storage.sync.get(['dogeAutoRefresh', 'dogeComicSans']);
       }).then(result => {
-        autoDoge = result.dogeAutoRefresh || false;
+        runDogMoneyMode = result.dogeAutoRefresh || false;
+        comicMode = result.dogeComicSans || false;
 
-        if(!firstRun && !autoDoge)
+        if(comicMode) {
+            document.getElementsByTagName("html")[0].classList.add("dogmoneymode-comic-sans");
+        }
+
+        if(!firstRun && !runDogMoneyMode)
         {
-            clearInterval(autoDogeInterval);
+            clearInterval(updateViewInterval);
             window.location.reload();
         }
-        runAutoDoge();
+        updateView();
       }).catch(error => console.log('An error occurred:', error));
       
   }
@@ -256,9 +264,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       convertPrices();
     }
     if(request.action == "autoChanged") {
-        autoChanged(false);
+        updateState(false);
     };
   });
 
 
-  autoChanged(true);
+  updateState(true);
