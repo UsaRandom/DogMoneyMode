@@ -53,11 +53,17 @@ function processMatches(text, regexToMatch) {
         if (dogecoinAmount !== null) {
             var fractionDigitsOptions = {};
 
-            //only show decimal points if we have less than 1000
-            if (dogecoinAmount < 1000) {
+            if (dogecoinAmount < 1) {
+                //dogecoin did a thing, show 3 decimal points
+                fractionDigitsOptions.minimumFractionDigits = 3;
+                fractionDigitsOptions.maximumFractionDigits = 3;
+            }
+            else if (dogecoinAmount < 100) {
+                //only show decimal points if we have less than 100
                 fractionDigitsOptions.minimumFractionDigits = 2;
                 fractionDigitsOptions.maximumFractionDigits = 2;
-            } else {
+            }
+            else {
                 fractionDigitsOptions.minimumFractionDigits = 0;
                 fractionDigitsOptions.maximumFractionDigits = 0;
             }
@@ -77,54 +83,21 @@ This logic replaces most fiat prices on the web.
 
 */
 
-function processNodesRecursively(node, regexToMatch, useInnerHtml) {
+function processNodesRecursively(node, regexToMatch) {
 
-    
     // If this node is an input field or contenteditable, skip processing
     if (node.tagName && node.tagName.toLowerCase() === 'input') return;
     if (node.isContentEditable) return;
 
 
     // If this node has children, recursively process the children first
-    if (node.children.length > 0) {
-        Array.from(node.children).forEach(child => processNodesRecursively(child, regexToMatch, useInnerHtml));
+    if (node.childNodes.length > 0) {
+        Array.from(node.childNodes).forEach(child => processNodesRecursively(child, regexToMatch));
     }
-    
-    // Determine if this node is eligible for processing
-    var isEligibleNode = node.children.length === 0; // Process leaf nodes
-    var onlyDecorations = false;
-
-    if (!isEligibleNode && node.children.length > 0) { // Check for nodes with only children but no grandchildren
-        isEligibleNode = Array.from(node.children).every(function(child) {
-            return !child.children.length;
-        });
-
-        onlyDecorations = Array.from(node.children).every(function(child) {
-            return ['em', 'strong', 'i'].includes(child.tagName.toLowerCase());
-        });
-    }
-
-
-    if(isEligibleNode) {
-        let result;
-
-        if(node.children.length > 0 || useInnerHtml){
-            if(onlyDecorations && !useInnerHtml) {
-                result = processMatches(node.textContent, regexToMatch);
-                if (result.replaced) {
-                    node.textContent = result.text;
-                }
-            } else {
-                result = processMatches(node.innerHTML, regexToMatch);
-                if (result.replaced) {
-                    node.innerHTML = result.text;
-                }
-            }
-        } else {
-            result = processMatches(node.textContent, regexToMatch);
-            if (result.replaced) {
-                node.textContent = result.text;
-            }
+    else {
+        let result = processMatches(node.textContent, regexToMatch);
+        if (result.replaced) {
+            node.textContent = result.text;
         }
     }
 }
@@ -132,13 +105,10 @@ function processNodesRecursively(node, regexToMatch, useInnerHtml) {
 function convertPrices() {
     var regex = createCurrencyRegex(fiat_currency_symbol);
 
-    var useInnerHtml = false;
-
     /*
         Amazon breaks prices up into many elements, it gets some custom logic.
     */
     if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
-        useInnerHtml = true;
        var priceElements = document.querySelectorAll('.a-price');
         priceElements.forEach(function(priceElement) {
             if(!priceElement.textContent.includes('Ð')){
@@ -183,7 +153,7 @@ function convertPrices() {
                 var dollarSymbolIndex = Array.from(priceElement.childNodes).findIndex(node => node.nodeType === 3 && node.nodeValue.includes('$'));
         
                 if (strongElement && supElement && dollarSymbolIndex > -1) {
-                    var fiat = strongElement.textContent + '.' + supElement.textContent.replace(/,/g, '');
+                    var fiat = strongElement.textContent.replace(/,/g, '') + '.' + supElement.textContent.replace(/,/g, '');
                     var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
@@ -207,7 +177,7 @@ function convertPrices() {
                 var currencySymbolElement = priceElement.querySelector('.goods-price-symbol');
 
                 if (strongElement && supElement) {
-                    var fiat = strongElement.textContent + '.' + supElement.textContent.replace(/,/g, '');
+                    var fiat = strongElement.textContent.replace(/,/g, '') + '.' + supElement.textContent.replace(/,/g, '');
                     var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
@@ -227,7 +197,7 @@ function convertPrices() {
     
 
     // Start processing at the body tag
-    processNodesRecursively(document.body, regex, useInnerHtml);
+    processNodesRecursively(document.body, regex);
 }
 
 
