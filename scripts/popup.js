@@ -26,15 +26,24 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
+
   chrome.storage.sync.get(['dogeAutoRefresh'], function(result) {
     document.getElementById("auto-refresh").checked = result.dogeAutoRefresh || false;
     document.getElementById("auto-refresh").addEventListener("change", function(e) {
       chrome.storage.sync.set({'dogeAutoRefresh': e.target.checked}, function() {
-          notifyAutoChanged();
+          notifyStateChange();
       });
     });
   });
 
+  chrome.storage.sync.get(['dogeComicSans'], function(result) {
+    document.getElementById("comic-sans").checked = result.dogeComicSans || false;
+    document.getElementById("comic-sans").addEventListener("change", function(e) {
+      chrome.storage.sync.set({'dogeComicSans': e.target.checked}, function() {
+          notifyStateChange();
+      });
+    });
+  });
 
   chrome.storage.sync.get(['fiat_currency', 'fiat_currency_symbol'], function(items) {
     if (items.fiat_currency && items.fiat_currency_symbol) {
@@ -79,7 +88,7 @@ function notifyConvertPrices() {
 
 }
 
-function notifyAutoChanged() {
+function notifyStateChange() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
       action: "autoChanged"
