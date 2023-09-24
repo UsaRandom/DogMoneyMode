@@ -219,8 +219,16 @@ function updateView() {
 
     if(runDogMoneyMode) {
         convertPrices();
-        updateViewInterval = setInterval(updateView, updateSpeed);
     }
+    
+    if (comicMode) {
+        if (!document.documentElement.classList.contains("dogmoneymode-comic-sans")) {
+            document.documentElement.classList.add("dogmoneymode-comic-sans");
+        }
+    }
+    
+    
+    updateViewInterval = setInterval(updateView, updateSpeed);
 }
 
 function updateState(firstRun) {
