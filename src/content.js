@@ -33,7 +33,7 @@ function createCurrencyRegex(currencySymbol) {
 
 function processMatches(text, regexToMatch) {
 
-    replaced = false;
+    let replaced = false;
 
     while (true) {
         var matches = text.match(regexToMatch);
@@ -103,105 +103,13 @@ function processNodesRecursively(node, regexToMatch) {
     }
 }
   
-function convertPrices() {
-    var regex = createCurrencyRegex(fiat_currency_symbol);
+import { AmazonPriceReplacer } from './websites/AmazonPriceReplacer';
+import { NewEggPriceReplacer } from './websites/NewEggPriceReplacer';
 
-    /*
-        Amazon breaks prices up into many elements, it gets some custom logic.
-    */
-    if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
-       var priceElements = document.querySelectorAll('.a-price');
-        priceElements.forEach(function(priceElement) {
-            if(!priceElement.textContent.includes('Ð')){
-                var offscreenElement = priceElement.querySelector('.a-offscreen');
-                var visiblePriceElements = priceElement.querySelectorAll('.a-price-whole, .a-price-fraction');
-                var currencySymbolElement = priceElement.querySelector('.a-price-symbol');
+let websitePriceReplacers = [];
 
-                if (offscreenElement && visiblePriceElements.length > 0) {
-                    // Remove currency symbol and commas before conversion to float
-                    var fiat = offscreenElement.textContent.replace(fiat_currency_symbol, '').replace(/,/g, '');
-                    var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
-                                                                    minimumFractionDigits: 2,
-                                                                    maximumFractionDigits: 2
-                                                                });
-
-                    offscreenElement.textContent = 'Ð' + dogefy;
-
-                    if (currencySymbolElement) {
-                        currencySymbolElement.textContent = 'Ð';
-                    }
-
-                    var [whole, fraction] = dogefy.split('.');
-                    visiblePriceElements[0].textContent = whole + visiblePriceElements[0].querySelector('.a-price-decimal').textContent;
-                    visiblePriceElements[1].textContent = fraction;
-                }
-            }
-        });
-
-    }
-
-    /* 
-        Newegg also breaks up prices into many elements, it also gets custom logic.
-    */
-   if (/^(www\.)?newegg\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
-        var priceElements = document.querySelectorAll('.price-current');
-        var goodsPriceElements = document.querySelectorAll('.goods-price-current');
-    
-        priceElements.forEach(function(priceElement) {
-            if(!priceElement.textContent.includes('Ð')){
-                var strongElement = priceElement.querySelector('strong');
-                var supElement = priceElement.querySelector('sup');
-                var dollarSymbolIndex = Array.from(priceElement.childNodes).findIndex(node => node.nodeType === 3 && node.nodeValue.includes('$'));
-        
-                if (strongElement && supElement && dollarSymbolIndex > -1) {
-                    var fiat = strongElement.textContent.replace(/,/g, '') + '.' + supElement.textContent.replace(/,/g, '');
-                    var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-        
-                    var [whole, fraction] = dogefy.split('.');
-                    strongElement.textContent = whole;
-                    supElement.textContent = fraction;
-                    
-                    var textNode = priceElement.childNodes[dollarSymbolIndex];
-                    textNode.nodeValue = textNode.nodeValue.replace(fiat_currency_symbol, 'Ð');
-                }
-            }
-        });
-
-
-        goodsPriceElements.forEach(function(priceElement) {
-            if(!priceElement.textContent.includes('Ð')){
-                var strongElement = priceElement.querySelector('.goods-price-value strong');
-                var supElement = priceElement.querySelector('.goods-price-value sup');
-                var currencySymbolElement = priceElement.querySelector('.goods-price-symbol');
-
-                if (strongElement && supElement) {
-                    var fiat = strongElement.textContent.replace(/,/g, '') + '.' + supElement.textContent.replace(/,/g, '');
-                    var dogefy = (parseFloat(fiat) / parseFloat(dogecoinValue)).toLocaleString('en', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-
-                    var [whole, fraction] = dogefy.split('.');
-                    strongElement.textContent = whole;
-                    supElement.textContent = fraction;
-
-                    if (currencySymbolElement) {
-                        currencySymbolElement.textContent = 'Ð';
-                    }
-                }            
-            }
-        });
-    }
-    
-
-    // Start processing at the body tag
-    processNodesRecursively(document.body, regex);
-}
-
-
+websitePriceReplacers.push(new AmazonPriceReplacer());
+websitePriceReplacers.push(new NewEggPriceReplacer());
 
 
 import { AppStateStore } from './AppStateStore';
@@ -213,34 +121,49 @@ const appStateStore = new AppStateStore();
 const exchangeRateStore = new ExchangeRateStore();
 
 let state = appStateStore.getAppState();
-let rates = exchangeRateStore.getRates();
+let exchangeRates = exchangeRateStore.getRates();
 
 let updateInterval = null;
 
 
-function update() {
-    clearInterval(updateInterval);
+(async function update() {
+    try {
+        clearInterval(updateInterval);
 
-    let oldState = state;
-    state = appStateStore.getAppState();
+        let oldState = state;
+        state = await appStateStore.getAppState();
 
-    if(state.dogMoneyModeEnabled) {
-        rates = exchangeRateStore.getRates();
-        dogecoinValue = rates.USD;
-        convertPrices();
-    } else if(oldState.dogMoneyModeEnabled) {
-        location.reload();
-    }
-    
-    if (state.comicSansModeEnabled) {
-        document.documentElement.classList.add("dogmoneymode-comic-sans");
-    }
-    else {
-        document.documentElement.classList.remove("dogmoneymode-comic-sans");
-    }
+        if(state.dogMoneyModeEnabled) {
+            exchangeRates = await exchangeRateStore.getRates();
+            dogecoinValue = exchangeRates.usd;
+            convertPrices();
+        } else if(oldState.dogMoneyModeEnabled) {
+            location.reload();
+        }
+        
+        if (state.comicSansModeEnabled) {
+            document.documentElement.classList.add("dogmoneymode-comic-sans");
+        }
+        else {
+            document.documentElement.classList.remove("dogmoneymode-comic-sans");
+        }
 
-    updateInterval = setInterval(updateView, updateSpeed);
+        updateInterval = setInterval(update, updateSpeed);
+    } catch (error) {
+        console.error(error);
+    }
+})();
+
+
+
+function convertPrices() {
+
+    websitePriceReplacers.forEach(priceReplacer => {
+        priceReplacer.replace(exchangeRates);
+    });
+
+    var regex = createCurrencyRegex(fiat_currency_symbol);
+
+    // Start processing at the body tag
+    processNodesRecursively(document.body, regex);
 }
-
-
-update();

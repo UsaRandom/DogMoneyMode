@@ -3,13 +3,28 @@ class AppStateStore {
     this.localStorageKey = 'dmm-app-state';
   }
 
-  setAppState(stateObj) {
-    localStorage.setItem(this.localStorageKey, JSON.stringify(stateObj));
+  async setAppState(stateObj) {
+    const obj = {};
+    obj[this.localStorageKey] = stateObj;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(obj, () => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve();
+      });
+    });
   }
 
-  getAppState() {
-    const storedData = JSON.parse(localStorage.getItem(this.localStorageKey));
-    return storedData || {"dogMoneyModeEnabled": false, "comicSansModeEnabled": false};
+  async getAppState() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(this.localStorageKey, (result) => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve(result[this.localStorageKey] || {"dogMoneyModeEnabled": false, "comicSansModeEnabled": false});
+      });
+    });
   }
 }
 

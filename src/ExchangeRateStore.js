@@ -15,16 +15,31 @@ class ExchangeRateStore {
       rates,
     };
 
-    localStorage.setItem(this.localStorageKey, JSON.stringify(storageObject));
-    return storageObject;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set({ [this.localStorageKey]: storageObject }, () => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve(storageObject);
+      });
+    });
   }
 
   async getRates() {
-    let storedData = JSON.parse(localStorage.getItem(this.localStorageKey));
-    if (!storedData || Date.now() - storedData.updatedOn > this.timeToLive) {
-      storedData = this._fetchRates();
-    }
-    return storedData.rates;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(this.localStorageKey, async (result) => {
+        let storedData = result[this.localStorageKey];
+        if (!storedData || Date.now() - storedData.updatedOn > this.timeToLive) {
+          try {
+            storedData = await this._fetchRates();
+          } catch (error) {
+            return reject(error);
+          }
+        }
+        resolve(storedData.rates);
+      });
+    });
   }
 }
+
 export { ExchangeRateStore };
