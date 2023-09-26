@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/mstauber/DogMoneyMode/issues"
   },
-  "homepage": "https://github.com/mstauber/DogMoneyMode#readme"
+  "homepage": "https://github.com/mstauber/DogMoneyMode#readme",
+  "devDependencies": {
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
 }

@@ -3,10 +3,7 @@
     "name": "DogMoneyMode",
     "version": "1.3",
     "description": "Browser extension that makes fiat prices display in Dogecoin. Fiat Supported: USD, GBP, EUR.",
-    "background": {
-      "service_worker": "scripts/background.js"
-    },
-    "permissions": ["alarms", "storage"],
+    "permissions": ["storage"],
     "action": {
       "default_popup": "popup.html"
     },

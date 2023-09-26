@@ -1,12 +1,5 @@
-var fiat_currency = 'usd';
-var fiat_currency_symbol = "$";
-var dogecoinValue = 0.0774;
-var updateSpeed = 500;
-
-var runDogMoneyMode = false;
-var updateViewInterval = null;
-
-var comicMode = false;
+const fiat_currency_symbol = "$";
+let dogecoinValue = 0.0774;
 
 
 function convertToDogecoin(currencyStr, regexToMatch, conversionRate) {
@@ -90,11 +83,6 @@ function processMatches(text, regexToMatch) {
 }
 
 
-/*
-
-This logic replaces most fiat prices on the web.
-
-*/
 
 function processNodesRecursively(node, regexToMatch) {
 
@@ -216,77 +204,43 @@ function convertPrices() {
 
 
 
+import { AppStateStore } from './AppStateStore';
+import { ExchangeRateStore } from './ExchangeRateStore';
+
+const updateSpeed = 500;
+
+const appStateStore = new AppStateStore();
+const exchangeRateStore = new ExchangeRateStore();
+
+let state = appStateStore.getAppState();
+let rates = exchangeRateStore.getRates();
+
+let updateInterval = null;
 
 
+function update() {
+    clearInterval(updateInterval);
 
+    let oldState = state;
+    state = appStateStore.getAppState();
 
-
-function updateView() {
-    clearInterval(updateViewInterval);
-
-    if(runDogMoneyMode) {
+    if(state.dogMoneyModeEnabled) {
+        rates = exchangeRateStore.getRates();
+        dogecoinValue = rates.USD;
         convertPrices();
+    } else if(oldState.dogMoneyModeEnabled) {
+        location.reload();
     }
     
-    if (comicMode) {
-        if (!document.documentElement.classList.contains("dogmoneymode-comic-sans")) {
-            document.documentElement.classList.add("dogmoneymode-comic-sans");
-        }
+    if (state.comicSansModeEnabled) {
+        document.documentElement.classList.add("dogmoneymode-comic-sans");
     }
     else {
-        if (document.documentElement.classList.contains("dogmoneymode-comic-sans")) {
-            document.documentElement.classList.remove("dogmoneymode-comic-sans");
-        }
+        document.documentElement.classList.remove("dogmoneymode-comic-sans");
     }
-    
-    
-    updateViewInterval = setInterval(updateView, updateSpeed);
+
+    updateInterval = setInterval(updateView, updateSpeed);
 }
 
-function updateState(firstRun) {
-    chrome.runtime.sendMessage({command: "updatePrice"}).then(response => {
-        if(response.error) {
-          console.log("An error occurred: " + response.error);
-          return;
-        }
-      
-        dogecoinValue = response.dogecoinValue;
-        fiat_currency = response.fiat_currency ?? 'usd';
-        fiat_currency_symbol = response.fiat_currency_symbol ?? '$';
-        
-        return chrome.storage.sync.get(['dogeAutoRefresh', 'dogeComicSans']);
-      }).then(result => {
-        runDogMoneyMode = result.dogeAutoRefresh || false;
-        comicMode = result.dogeComicSans || false;
 
-        if(comicMode) {
-            document.getElementsByTagName("html")[0].classList.add("dogmoneymode-comic-sans");
-        }
-
-        if(!firstRun && !runDogMoneyMode)
-        {
-            clearInterval(updateViewInterval);
-            window.location.reload();
-        }
-        updateView();
-      }).catch(error => console.log('An error occurred:', error));
-      
-  }
-
-  
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action == "convertPrices") {
-      // Use incoming message data
-      fiat_currency_symbol = request.currencySymbol;
-      dogecoinValue = request.conversionPrice;
-      fiat_currency = request.currencyCode;
-  
-      convertPrices();
-    }
-    if(request.action == "autoChanged") {
-        updateState(false);
-    };
-  });
-
-
-  updateState(true);
+update();
