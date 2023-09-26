@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            background-color: #fae0d4;
+            padding: 5px;
+            width: 250px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        h5 {
+            margin: 14px 0px;
+            font-size: 12px;
+        }
+
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 150px; 
+            height: 68px; 
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 58px; 
+            width: 58px;
+            left: 5px;
+            bottom: 5px; 
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(75px); 
+            -ms-transform: translateX(75px); 
+            transform: translateX(75px); 
+        }
+
+       
+        .slider.round {
+            border-radius: 68px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        #tips {
+            display:block;
+        }
+        .tip-content {
+        display: none;
+        }
+
+        .tip-content img {
+        width: 250px;
+        height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DogMoneyMode</h1>
+    <label class="switch">
+        <input type="checkbox" id="auto-refresh" name="auto-refresh">
+        <span class="slider round"></span>
+    </label>
+    <h3 style="margin-bottom: 0px;">Comic Sans Mode:</h3>
+    <label class="switch" style="scale: 0.5;">
+        <input type="checkbox" id="comic-sans" name="comic-sans">
+        <span class="slider round"></span>
+    </label>
+    <h5>Dogecoin: <span id="fiat-price"></span></h5>
+    <select id="currency-select">
+        <option value="usd,$">USD</option>
+        <option value="eur,€">EUR</option>
+        <option value="gbp,£">GBP</option>
+    </select>
+
+    <a id="tips" href="#">Tips</a>
+    <div id="tip-content" class="tip-content">
+      <p>Dogecoin:<br>D6hbn1AugHq3WVtTVSv1fZAg6atPAMtwuV</p>
+      <img src="images/tip.png" alt="QR Code">
+    </div>
+    <script src="scripts\popup.js"></script>
+</body>
+</html>
