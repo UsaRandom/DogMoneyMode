@@ -73,7 +73,14 @@ function processMatches(text, regexToMatch) {
                 fractionDigitsOptions.minimumFractionDigits = 0;
                 fractionDigitsOptions.maximumFractionDigits = 0;
             }
-            text = text.replace(longestMatch, `Ð${dogecoinAmount.toLocaleString('en-US', fractionDigitsOptions)}`);
+            
+            let index = text.indexOf(longestMatch);
+            if (index > 0 && text.charAt(index - 1) === '-') {
+                text = text.replace(longestMatch, ` Ð${dogecoinAmount.toLocaleString('en-US', fractionDigitsOptions)}`);
+            } else {
+                text = text.replace(longestMatch, `Ð${dogecoinAmount.toLocaleString('en-US', fractionDigitsOptions)}`);
+            }
+            
             replaced = true;
         }
 
