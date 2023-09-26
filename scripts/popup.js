@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fiat_currency = result.fiat_currency ?? 'usd';
     fiat_currency_symbol = result.fiat_currency_symbol ?? '$';
     
-    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+    document.getElementById('fiat-price').textContent = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
   });
 
 
@@ -101,14 +101,14 @@ function notifyStateChange() {
 function forceUpdatePrice() {
   chrome.runtime.sendMessage({command: "forceUpdatePrice"},function(response) {
     dogecoinValue = response.dogecoinValue;
-    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+    document.getElementById('fiat-price').textContent = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
   });
 }
 
 function updatePrice() {
   notifyUpdatePrice(function(response) {
     dogecoinValue = response.dogecoinValue;
-    document.getElementById('fiat-price').innerHTML = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
+    document.getElementById('fiat-price').textContent = fiat_currency_symbol + ' ' + dogecoinValue.toFixed(3);
   });
 }
 
