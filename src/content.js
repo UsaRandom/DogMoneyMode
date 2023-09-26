@@ -1,39 +1,105 @@
-const fiat_currency_symbol = "$";
-let dogecoinValue = 0.0774;
+import { Currency } from './Utilities';
+
+import { AmazonPriceReplacer } from './websites/AmazonPriceReplacer';
+import { NewEggPriceReplacer } from './websites/NewEggPriceReplacer';
+
+let websitePriceReplacers = [];
+
+websitePriceReplacers.push(new AmazonPriceReplacer());
+websitePriceReplacers.push(new NewEggPriceReplacer());
 
 
-function convertToDogecoin(currencyStr, regexToMatch, conversionRate) {
-    
-    //if we don't clone the regex we can have issues
-    const match = new RegExp(regexToMatch.source, regexToMatch.flags).exec(currencyStr);
-    
-    if (!match) {
-        return null; // not a valid currency string
+import { AppStateStore } from './AppStateStore';
+import { ExchangeRateStore } from './ExchangeRateStore';
+
+const updateSpeed = 500;
+
+const appStateStore = new AppStateStore();
+const exchangeRateStore = new ExchangeRateStore();
+
+let state = appStateStore.getAppState();
+let exchangeRates = exchangeRateStore.getRates();
+
+let updateInterval = null;
+
+
+
+
+
+(async function update() {
+    try {
+        clearInterval(updateInterval);
+
+        let oldState = state;
+        state = await appStateStore.getAppState();
+
+        if(state.dogMoneyModeEnabled) {
+            exchangeRates = await exchangeRateStore.getRates();
+            convertPrices();
+        } else if(oldState.dogMoneyModeEnabled) {
+            location.reload();
+        }
+        
+        if (state.comicSansModeEnabled) {
+            document.documentElement.classList.add("dogmoneymode-comic-sans");
+        }
+        else {
+            document.documentElement.classList.remove("dogmoneymode-comic-sans");
+        }
+
+        updateInterval = setInterval(update, updateSpeed);
+    } catch (error) {
+        console.error(error);
     }
-
-    // Remove the currency symbol, spaces, and commas, then parse as a float
-    const valueInCurrency = parseFloat(match[2].replace(/[, ]/g, ''));
+})();
 
 
-    // Convert to Dogecoin
-    return valueInCurrency / conversionRate;
-}
 
-function createCurrencyRegex(currencySymbol) {
-    // Escape the currency symbol to handle special characters in regex
-    const escapedSymbol = currencySymbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function convertPrices() {
 
-    // Create the regex pattern
-    const regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
+    websitePriceReplacers.forEach(priceReplacer => {
+        priceReplacer.replace(exchangeRates);
+    });
 
-    // Return the regex object
-    return new RegExp(regexPattern);
+    // Start processing at the body tag
+    processNodesRecursively(document.body);
 }
 
 
-function processMatches(text, regexToMatch) {
+
+
+
+function processNodesRecursively(node) {
+
+    // If this node is an input field or contenteditable, skip processing
+    if (node.tagName && node.tagName.toLowerCase() === 'input') return;
+    if (node.isContentEditable) return;
+
+
+    // If this node has children, recursively process the children first
+    if (node.childNodes.length > 0) {
+        Array.from(node.childNodes).forEach(child => processNodesRecursively(child));
+    }
+    else {
+        let result = processMatches(node.textContent);
+        if (result.replaced) {
+            node.textContent = result.text;
+        }
+    }
+}
+  
+
+
+
+function processMatches(text) {
 
     let replaced = false;
+    let currencyToUse = Currency.getCurrencyBySymbol(text);
+    let regexToMatch = Currency.getCurrencyRegex(currencyToUse);
+
+    if(!currencyToUse || !regexToMatch){
+        return {text, replaced};
+    }
 
     while (true) {
         var matches = text.match(regexToMatch);
@@ -48,7 +114,7 @@ function processMatches(text, regexToMatch) {
         }
 
         // process the longest match
-        var dogecoinAmount = convertToDogecoin(longestMatch, regexToMatch, dogecoinValue);
+        var dogecoinAmount = convertToDogecoin(currencyToUse, longestMatch, regexToMatch);
         if (dogecoinAmount !== null) {
             var fractionDigitsOptions = {};
 
@@ -84,86 +150,25 @@ function processMatches(text, regexToMatch) {
 
 
 
-function processNodesRecursively(node, regexToMatch) {
-
-    // If this node is an input field or contenteditable, skip processing
-    if (node.tagName && node.tagName.toLowerCase() === 'input') return;
-    if (node.isContentEditable) return;
-
-
-    // If this node has children, recursively process the children first
-    if (node.childNodes.length > 0) {
-        Array.from(node.childNodes).forEach(child => processNodesRecursively(child, regexToMatch));
+function convertToDogecoin(currencyToUse, currencyStr, regexToMatch) {
+    
+    //if we don't clone the regex we can have issues
+    const match = new RegExp(regexToMatch.source, regexToMatch.flags).exec(currencyStr);
+    
+    if (!match) {
+        return null; // not a valid currency string
     }
-    else {
-        let result = processMatches(node.textContent, regexToMatch);
-        if (result.replaced) {
-            node.textContent = result.text;
-        }
+
+    let matchIndex = 2;
+
+    if([Currency.CNY, Currency.JPY].indexOf(currencyToUse) > -1) {
+        matchIndex = 1;
     }
-}
-  
-import { AmazonPriceReplacer } from './websites/AmazonPriceReplacer';
-import { NewEggPriceReplacer } from './websites/NewEggPriceReplacer';
 
-let websitePriceReplacers = [];
-
-websitePriceReplacers.push(new AmazonPriceReplacer());
-websitePriceReplacers.push(new NewEggPriceReplacer());
+    // Remove the currency symbol, spaces, and commas, then parse as a float
+    const valueInCurrency = parseFloat(match[matchIndex].replace(/[, ]/g, ''));
 
 
-import { AppStateStore } from './AppStateStore';
-import { ExchangeRateStore } from './ExchangeRateStore';
-
-const updateSpeed = 500;
-
-const appStateStore = new AppStateStore();
-const exchangeRateStore = new ExchangeRateStore();
-
-let state = appStateStore.getAppState();
-let exchangeRates = exchangeRateStore.getRates();
-
-let updateInterval = null;
-
-
-(async function update() {
-    try {
-        clearInterval(updateInterval);
-
-        let oldState = state;
-        state = await appStateStore.getAppState();
-
-        if(state.dogMoneyModeEnabled) {
-            exchangeRates = await exchangeRateStore.getRates();
-            dogecoinValue = exchangeRates.usd;
-            convertPrices();
-        } else if(oldState.dogMoneyModeEnabled) {
-            location.reload();
-        }
-        
-        if (state.comicSansModeEnabled) {
-            document.documentElement.classList.add("dogmoneymode-comic-sans");
-        }
-        else {
-            document.documentElement.classList.remove("dogmoneymode-comic-sans");
-        }
-
-        updateInterval = setInterval(update, updateSpeed);
-    } catch (error) {
-        console.error(error);
-    }
-})();
-
-
-
-function convertPrices() {
-
-    websitePriceReplacers.forEach(priceReplacer => {
-        priceReplacer.replace(exchangeRates);
-    });
-
-    var regex = createCurrencyRegex(fiat_currency_symbol);
-
-    // Start processing at the body tag
-    processNodesRecursively(document.body, regex);
+    // Convert to Dogecoin
+    return valueInCurrency / exchangeRates[currencyToUse];
 }

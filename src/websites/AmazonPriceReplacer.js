@@ -11,30 +11,29 @@ class AmazonPriceReplacer {
         if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
 
             let priceElements = document.querySelectorAll('.a-price');
-            let detectedCurrency = null;
+            let detectedCurrency = false;
 
             priceElements.forEach(function(priceElement) {
                 
                 if(!priceElement.textContent.includes('Ð')){
-
                     let currencySymbolElement = priceElement.querySelector('.a-price-symbol');
-                    let currencySymbol = currencySymbolElement.textContent;
-
-                    if(!detectedCurrency){
-                        let currencyResult = Currency.getCurrencyBySymbol(currencySymbol);
+                    let currencySymbol = currencySymbolElement ? currencySymbolElement.textContent : null;
+                    let offscreenElement = priceElement.querySelector('.a-offscreen');
+                    let offscreenText = offscreenElement ? offscreenElement.textContent : null;
+                    
+                    if(currencySymbol && !detectedCurrency){
+                        let currencyResult = Currency.getCurrencyBySymbol(currencySymbol ? currencySymbol : offscreenText);
                         if(currencyResult) {
                             detectedCurrency = currencyResult;
-                            console.log("Detected ${currencyResult}")
                         }
                     }
-    
-                 var offscreenElement = priceElement.querySelector('.a-offscreen');
-                 var visiblePriceElements = priceElement.querySelectorAll('.a-price-whole, .a-price-fraction');
+                    
+                    let visiblePriceElements = priceElement.querySelectorAll('.a-price-whole, .a-price-fraction');
  
                  if (offscreenElement && visiblePriceElements.length > 0) {
                      // Remove currency symbol and commas before conversion to float
-                     var fiat = offscreenElement.textContent.replace(currencySymbol, '').replace(/,/g, '');
-                     var dogefy = (parseFloat(fiat) / parseFloat(exchangeRates[detectedCurrency])).toLocaleString('en', {
+                     let fiat = offscreenElement.textContent.replace(currencySymbol, '').replace(/,/g, '');
+                     let dogefy = (parseFloat(fiat) / parseFloat(exchangeRates[detectedCurrency])).toLocaleString('en', {
                                                                      minimumFractionDigits: 2,
                                                                      maximumFractionDigits: 2
                                                                  });
@@ -45,7 +44,7 @@ class AmazonPriceReplacer {
                          currencySymbolElement.textContent = 'Ð';
                      }
  
-                     var [whole, fraction] = dogefy.split('.');
+                     let [whole, fraction] = dogefy.split('.');
                      visiblePriceElements[0].textContent = whole + visiblePriceElements[0].querySelector('.a-price-decimal').textContent;
                      visiblePriceElements[1].textContent = fraction;
                  }
