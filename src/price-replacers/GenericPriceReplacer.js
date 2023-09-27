@@ -51,10 +51,9 @@ class GenericPriceReplacer {
     
         while (true) {
             var matches = text.match(regexToMatch, "g");
+            
             if (!matches) break; // exit the loop if no more matches
         
-            console.log(regexToMatch);
-            console.log(text);
             // find the longest match
             var longestMatch = matches.reduce(function(a, b) { return a.length > b.length ? a : b; });
             
