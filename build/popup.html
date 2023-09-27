@@ -17,6 +17,11 @@
             margin: 0;
             padding: 0;
         }
+        h1 {
+            margin-top: 2px;
+            padding: 0;
+            margin-bottom: 0;
+        }
         :root {
             --switch-width: 180px;
             --switch-height: 120px;
@@ -24,7 +29,7 @@
             --slider-move: calc(var(--switch-width) - var(--switch-height));
         }
         .switch {
-            top: 95px;
+            top: 66px;
             position: relative;
             display: inline-block;
             width: var(--switch-width);
@@ -111,13 +116,56 @@
             filter: grayscale(100%); 
         }
 
+        small {
+            font-size: 12px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            display: flex;
+            flex-flow: row;
+        }
+
+        .footer * {
+            width: 100%;
+            font-size: 20px;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .footer a {
+            color: #4f4fff;
+            border-left: 3px solid #5b4e19;
+        }
+        #comicsans-toggle {
+            color: #f3df83;
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari */
+            user-select: none; /* Standard syntax */
+        }
+
+        .comicsans-on {
+            background-color: #83691c;
+        }
     </style>
 </head>
 <body>
+    <h1>ÐogMoneyMode<small>v2.0</small></h1>
     <label class="switch">
-        <input type="checkbox" id="dogmoneymode-toggle" checked>
+        <input type="checkbox" id="dogmoneymode-toggle">
         <span class="slider round"></span>
     </label>
+
+    <div class="footer">
+        <div id="comicsans-toggle">
+            such comic!
+        </div>
+        <a href="https://github.com/UsaRandom/DogMoneyMode" target="_blank">@github</a>
+    </div>
       
     <!--
     <h3 style="margin-bottom: 0px;">Comic Sans Mode:</h3>

@@ -49,7 +49,7 @@ async function runAllTests() {
             resultElement.classList.add("fail");
         }
 
-        // Add a 2.5-second lag between each test
+        // dramatic pause!
         await new Promise(resolve => setTimeout(resolve, 50));
     }
 

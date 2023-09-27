@@ -45,8 +45,14 @@ class AmazonPriceReplacer {
                      }
  
                      let [whole, fraction] = dogefy.split('.');
-                     visiblePriceElements[0].textContent = whole + visiblePriceElements[0].querySelector('.a-price-decimal').textContent;
-                     visiblePriceElements[1].textContent = fraction;
+
+               //      let priceDecimalElement = visiblePriceElements[0].querySelector('.a-price-decimal');
+                     visiblePriceElements[0].textContent = whole + ".";
+
+                     if(visiblePriceElements.length > 1) {
+
+                        visiblePriceElements[1].textContent = fraction;
+                     }
                  }
              }
 

@@ -12,7 +12,7 @@ priceReplacers.push(new GenericPriceReplacer());
 import { AppStateStore } from './AppStateStore';
 import { ExchangeRateStore } from './ExchangeRateStore';
 
-const updateSpeed = 500;
+const updateSpeed = 200;
 
 const appStateStore = new AppStateStore();
 const exchangeRateStore = new ExchangeRateStore();
@@ -35,6 +35,13 @@ let updateInterval = null;
             convertPrices();
         } else if(oldState.dogMoneyModeEnabled) {
             location.reload();
+        }
+        
+        if (state.comicSansModeEnabled) {
+            document.documentElement.classList.add("dogmoneymode-comic-sans");
+        }
+        else {
+            document.documentElement.classList.remove("dogmoneymode-comic-sans");
         }
 
         updateInterval = setInterval(update, updateSpeed);
