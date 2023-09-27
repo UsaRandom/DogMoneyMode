@@ -35,41 +35,38 @@ class Currency {
 
     static getCurrencyRegex(currency) {
 
-        let escapedSymbol = null;
+        let symbol = null;
         let regexPattern = null;
 
         switch(currency) {
-            case "usd": 
-                escapedSymbol = "$".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
-                return new RegExp(regexPattern);
+            case "usd":
+                symbol = "$";
+                break;
             case "eur": 
-                escapedSymbol = "€".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
-                return new RegExp(regexPattern);
+                symbol = "€";
+                break;
+            case "gbp": 
+                symbol = "£";
+                break;
+            case "inr": 
+                symbol = "₹";
+                break;
+            case "rub": 
+                symbol = "₽";
+                break;
             case "cny": 
-                escapedSymbol = "元".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)(${escapedSymbol}\\s*)`;
+                symbol = "元".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                regexPattern = `(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d*)?)(${symbol}\\s*)`;
                 return new RegExp(regexPattern);
             case "jpy": 
-                escapedSymbol = "円".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)(${escapedSymbol}\\s*)`;
-                return new RegExp(regexPattern);
-            case "gbp": 
-                escapedSymbol = "£".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
-                return new RegExp(regexPattern);
-            case "inr": 
-                escapedSymbol = "₹".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
-                return new RegExp(regexPattern);
-            case "rub": 
-                escapedSymbol = "₽".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                regexPattern = `(${escapedSymbol}\\s*)(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d+)?)`;
+                symbol = "円".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                regexPattern = `(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d*(?:\\.\\d*)?)(${symbol}\\s*)`;
                 return new RegExp(regexPattern);
             default:
                 return null;
         }
+        regexPattern = `(?<!\\S)(\\${symbol}\\s*\\d*(?:,\\d{3})*(?:\\.\\d*)?(?!\\S))`;
+        return new RegExp(regexPattern);
     }
       
 }

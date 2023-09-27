@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Tests</title>
+    <style>
+      .test {
+        margin-top: 6px;
+        width: 390px;
+        display: flex;
+        text-align: center;
+      }
+      .header {
+        margin-top: 6px;
+        width: 390px;
+        display: flex;
+        text-align: center;
+        font-weight: bold;
+      }
+      .header div {
+        width: 130px;
+      }
+      .input {
+        width: 130px;
+        padding: 2;
+      }
+      .expected {
+        width: 130px;
+        padding: 2px;
+      }
+      .result { 
+        padding: 2px;
+        border: 1px solid;
+        flex-grow: 1;
+      }
+      .pass {
+        border-color: green;
+        background-color: rgb(201, 220, 204);
+        color: green;
+      }
+      .fail {
+        border-color: red;
+        background-color: rgb(255, 214, 214);
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>DogMoneyMode Testing Tool</h1>
+    <p><em>tip:</em> be sure to disabled the DogMoneyMode extension before running tests.</p>
+
+    <button id="run-button">Run Tests</button>
+
+    <h5>Basic Tests</h5>
+    <div class="header">
+      <div>Input</div>
+      <div>Expected</div>
+      <div>Result</div>
+    </div>
+    <div id="basic-tests">
+      <!-- USD -->
+      <div class="test">
+        <div class="input">$100.00</div>
+        <div class="expected">Ð1,656</div>
+        <div class="result">$100.00</div>
+      </div>
+
+      <!-- EUR -->
+      <div class="test">
+        <div class="input">€100.00</div>
+        <div class="expected">Ð1,750</div>
+        <div class="result">€100.00</div>
+      </div>
+
+      <!-- CNY -->
+      <div class="test">
+        <div class="input">100.00元</div>
+        <div class="expected">Ð227</div>
+        <div class="result">100.00元</div>
+      </div>
+
+      <!-- JPY -->
+      <div class="test">
+        <div class="input">1,000円</div>
+        <div class="expected">Ð111</div>
+        <div class="result">1,000円</div>
+      </div>
+
+      <!-- GBP -->
+      <div class="test">
+        <div class="input">£100.00</div>
+        <div class="expected">Ð2,013</div>
+        <div class="result">£100.00</div>
+      </div>
+
+      <!-- INR -->
+      <div class="test">
+        <div class="input">₹1,000.00</div>
+        <div class="expected">Ð199</div>
+        <div class="result">₹1,000.00</div>
+      </div>
+
+      <!-- RUB -->
+      <div class="test">
+        <div class="input">₽1,000.00</div>
+        <div class="expected">Ð172</div>
+        <div class="result">₽1,000.00</div>
+      </div>
+    </div>
+
+
+    <!-- USD Tests -->
+    <h5>USD Tests</h5>
+    <div class="header">
+      <div>Input</div>
+      <div>Expected</div>
+      <div>Result</div>
+    </div>
+    <div class="usd-tests">
+      <div class="test">
+        <div class="input">$1.00</div>
+        <div class="expected">Ð16.56</div>
+        <div class="result">$1.00</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$0.02</div>
+        <div class="expected">Ð0.331</div>
+        <div class="result">$0.02</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$.99</div>
+        <div class="expected">Ð16.40</div>
+        <div class="result">$.99</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$0.50</div>
+        <div class="expected">Ð8.28</div>
+        <div class="result">$0.50</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$1,999.99</div>
+        <div class="expected">Ð33,127</div>
+        <div class="result">$1,999.99</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$100,999</div>
+        <div class="expected">Ð1,672,889</div>
+        <div class="result">$100,999</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$1,234.56</div>
+        <div class="expected">Ð20,449</div>
+        <div class="result">$1,234.56</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$123</div>
+        <div class="expected">Ð2,037</div>
+        <div class="result">$123</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$12</div>
+        <div class="expected">Ð199</div>
+        <div class="result">$12</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$345.678</div>
+        <div class="expected">Ð5,726</div>
+        <div class="result">$345.678</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$7890</div>
+        <div class="expected">Ð130,685</div>
+        <div class="result">$7890</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$0.001</div>
+        <div class="expected">Ð0.017</div>
+        <div class="result">$0.001</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$0</div>
+        <div class="expected">Ð0.000</div>
+        <div class="result">$0</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$5,000,000.00</div>
+        <div class="expected">Ð82,817,107</div>
+        <div class="result">$5,000,000.00</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">$75 to $350</div>
+        <div class="expected">Ð1,242 to Ð5,797</div>
+        <div class="result">$75 to $350</div>
+      </div>
+      
+    </div>
+
+
+    <!-- EURO Tests -->
+    <h5>EUR Tests</h5>
+    <div class="header">
+      <div>Input</div>
+      <div>Expected</div>
+      <div>Result</div>
+    </div>
+    <div class="eur-tests">
+      <div class="test">
+        <div class="input">€1.00</div>
+        <div class="expected">Ð17.50</div>
+        <div class="result">€1.00</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€0.02</div>
+        <div class="expected">Ð0.350</div>
+        <div class="result">€0.02</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€.99</div>
+        <div class="expected">Ð17.33</div>
+        <div class="result">€.99</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€0.50</div>
+        <div class="expected">Ð8.75</div>
+        <div class="result">€0.50</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€1,999.99</div>
+        <div class="expected">Ð35,008</div>
+        <div class="result">€1,999.99</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€100,999</div>
+        <div class="expected">Ð1,767,911</div>
+        <div class="result">€100,999</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€1,234.56</div>
+        <div class="expected">Ð21,610</div>
+        <div class="result">€1,234.56</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€123</div>
+        <div class="expected">Ð2,153</div>
+        <div class="result">€123</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€12</div>
+        <div class="expected">Ð210</div>
+        <div class="result">€12</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€345.678</div>
+        <div class="expected">Ð6,051</div>
+        <div class="result">€345.678</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€7890</div>
+        <div class="expected">Ð138,108</div>
+        <div class="result">€7890</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€0.001</div>
+        <div class="expected">Ð0.018</div>
+        <div class="result">€0.001</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€0</div>
+        <div class="expected">Ð0.000</div>
+        <div class="result">€0</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€5,000,000.00</div>
+        <div class="expected">Ð87,521,224</div>
+        <div class="result">€5,000,000.00</div>
+      </div>
+      
+      <div class="test">
+        <div class="input">€75 to €350</div>
+        <div class="expected">Ð1,313 to Ð6,126</div>
+        <div class="result">€75 to €350</div>
+      </div>
+      
+    </div>
+    
+
+    
+    <script src="./tests.js"></script>
+
+  </body>
+</html>

@@ -6,11 +6,11 @@ class AmazonPriceReplacer {
 
     }
 
-    replace(exchangeRates) {
+    replace(windowObj, node, exchangeRates) {
         
-        if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
+        if (/^(www\.)?amazon\.[a-z\.]{2,5}$/.test(windowObj.location.hostname)) {
 
-            let priceElements = document.querySelectorAll('.a-price');
+            let priceElements = node.querySelectorAll('.a-price');
             let detectedCurrency = false;
 
             priceElements.forEach(function(priceElement) {

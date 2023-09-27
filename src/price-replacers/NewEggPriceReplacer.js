@@ -2,15 +2,16 @@
 class NewEggPriceReplacer {
 
 
-    replace(exchangeRates) {
+
+    replace(windowObj, node, exchangeRates) {
 
         let dogecoinValue = exchangeRates.usd;
         
-        if (/^(www\.)?newegg\.[a-z\.]{2,5}$/.test(window.location.hostname)) {
+        if (/^(www\.)?newegg\.[a-z\.]{2,5}$/.test(windowObj.location.hostname)) {
 
 
-            let priceElements = document.querySelectorAll('.price-current');
-            let goodsPriceElements = document.querySelectorAll('.goods-price-current');
+            let priceElements = node.querySelectorAll('.price-current');
+            let goodsPriceElements = node.querySelectorAll('.goods-price-current');
 
             priceElements.forEach(function(priceElement) {
                 if(!priceElement.textContent.includes('Ð')){
