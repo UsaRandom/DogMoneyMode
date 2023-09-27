@@ -1,0 +1,23 @@
+{
+  "name": "dogmoneymode",
+  "version": "2.0.0",
+  "description": "Convert prices to Dogecoin in realtime",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mstauber/DogMoneyMode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mstauber/DogMoneyMode/issues"
+  },
+  "homepage": "https://github.com/mstauber/DogMoneyMode#readme",
+  "devDependencies": {
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
