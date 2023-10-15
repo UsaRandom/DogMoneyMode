@@ -1,10 +1,10 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "DogMoneyMode",
     "version": "2.1",
     "description": "Browser extension that makes fiat prices display in Dogecoin. Works with USD, EUR, GBP, etc.",
     "permissions": ["storage"],
-    "browser_action": {
+    "action": {
       "default_popup": "popup.html"
     },
     "icons": {
@@ -21,14 +21,7 @@
       }
     ],
     "background": {
-      "scripts": ["scripts/background.js"],
-      "persistent": true
-    },
-    "browser_specific_settings": {
-        "gecko": {
-          "id": "dogmoneymode@gmail.com",
-          "strict_min_version": "109.0"
-        }
-      }
-}
+      "service_worker": "scripts/background.js"
+    }
+  }
   
