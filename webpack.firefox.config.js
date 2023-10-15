@@ -22,6 +22,22 @@ module.exports = {
                     from: `./src/firefox-manifest.json`,
                     to: '../manifest.json',
                 },
+                {
+                    from: `./src/popup.html`,
+                    to: '../popup.html',
+                },
+                {
+                    from: `./src/wow.mp3`,
+                    to: '../wow.mp3',
+                },
+                {
+                    from: './src/images/*.png',
+                    to: '../images/[name][ext]',
+                },
+                {
+                    from: './src/styles/*.css',
+                    to: '../styles/[name][ext]',
+                }
             ],
         }),
     ],

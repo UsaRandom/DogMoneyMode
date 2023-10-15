@@ -22,7 +22,7 @@ class AppStateStore {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
-        resolve(result[this.localStorageKey] || {"dogMoneyModeEnabled": false, "comicSansModeEnabled": false});
+        resolve(result[this.localStorageKey] || {"dogMoneyModeEnabled": false, "comicSansModeEnabled": false, "wowButtonMuted": false});
       });
     });
   }
