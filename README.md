@@ -3,7 +3,8 @@
 # DogMoneyMode
 Browser extension that automatically converts fiat prices to display in Dogecoin. Supports most popular sites. Fiat Supported: USD, EUR, GBP, INR, & RUB.
 
-![image](https://github.com/UsaRandom/DogMoneyMode/assets/2897796/81d6ce71-75cd-48a4-b803-dd2eda892e9c)
+![image](https://github.com/UsaRandom/DogMoneyMode/assets/2897796/9a8f55ac-28c8-474c-8151-df2f01f23e64)
+
 ![output-onlinegiftools](https://github.com/mstauber/DogMoneyMode/assets/2897796/4907b0f4-ba41-455a-9144-0f5ce61da743)
 
 
@@ -16,24 +17,37 @@ You can easily add DogMoneyMode to Chrome and Edge via the chrome webstore.
 [Install via Chrome Webstore](https://chrome.google.com/webstore/detail/dogmoneymode/biohgaaeeifjpamlfinoloeomblpbnfm)
 
 
-### Chrome - Manual Install
-
-1. Download the extension files and place them in a folder on your computer.
-2. Open Chrome and navigate to `chrome://extensions`.
-3. Enable "Developer mode" in the top right corner.
-4. Click "Load unpacked" in the top left corner.
-5. Navigate to the extension folder and click "Open".
-6. The extension should now be loaded into Chrome.
 
 
-### Microsoft Edge
+# Build
 
-1. Download the extension files and place them in a folder on your computer.
-2. Open Edge and navigate to `edge://extensions`.
-3. Enable "Developer mode" at the bottom of the page.
-4. Click "Load unpacked" at the top of the page.
-5. Navigate to the extension folder and click "Select Folder".
-6. The extension should now be loaded into Edge.
+## Prerequisites
+
+- Node.js and npm.
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+## Build for Chrome/Edge
+
+Run webpack to build the chrome/edge version of the extension (outputs to ./build/)
+
+```bash
+webpack --config webpack.chrome.config.js
+```
+
+## Build for Firefox
+
+Run webpack to build the firefox version of the extension (outputs to ./build/)
+
+```bash
+webpack --config webpack.firefox.config.js
+```
+
+
 
 
 Inspired by https://github.com/qlpqlp/dogefy
