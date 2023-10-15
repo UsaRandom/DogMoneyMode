@@ -151,10 +151,22 @@
         .comicsans-on {
             background-color: #83691c;
         }
+
+        #mute-toggle {
+            color: #f3df83;
+            border-left: 3px solid #5b4e19;
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari */
+            user-select: none; /* Standard syntax */
+        }
+
+        .mute-on {
+            background-color: #83691c;
+        }
     </style>
 </head>
 <body>
-    <h1>ÐogMoneyMode<small>v2.0</small></h1>
+    <h1>ÐogMoneyMode<small>v2.1</small></h1>
     <label class="switch">
         <input type="checkbox" id="dogmoneymode-toggle">
         <span class="slider round"></span>
@@ -164,17 +176,11 @@
         <div id="comicsans-toggle">
             such comic!
         </div>
-        <a href="https://github.com/UsaRandom/DogMoneyMode" target="_blank">@github</a>
+        <div id="mute-toggle">
+            very quiet
+        </div>
     </div>
       
-    <!--
-    <h3 style="margin-bottom: 0px;">Comic Sans Mode:</h3>
-    <label class="switch" style="scale: 0.5;">
-        <input type="checkbox" id="comicsans-toggle" name="comicsans-toggle">
-        <span class="slider round"></span>
-    </label>
-
-    <a id="tips" href="#"><em>Tips:</em> D6hbn1AugHq3WVtTVSv1fZAg6atPAMtwuV</a>-->
     <script src="scripts/popup.js"></script>
 </body>
 </html>
