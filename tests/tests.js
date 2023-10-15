@@ -37,6 +37,37 @@ class Currency {
         }
         return false;
       }
+/*
+
+Test set for regex:
+
+$123
+$123.456
+-$123,456
+$123,456.789
+$12,000,000
+aaaa$42,000,00
+$42,000,000aaa
+($0.07/Fl Oz)
+$1.00
+$0.02
+$ .99
+$0.50
+$ 1,999.99
+$100,999
+$1,234.56
+$ 123
+$12
+$345.678
+$7890
+$0.001
+$0
+$5,000,000.00
+
+
+*/
+
+
 
     static getCurrencyRegex(currency) {
 
@@ -70,7 +101,7 @@ class Currency {
             default:
                 return null;
         }
-        regexPattern = `(?<!\\S)(\\${symbol}\\s*\\d*(?:,\\d{3})*(?:\\.\\d*)?(?!\\S))`;
+        regexPattern = `(\\${symbol}\\s*\\d*(?:,\\d{3})*(?:\\.\\d*)?(?=[\\s\\/]*))`;
         return new RegExp(regexPattern);
     }
       
@@ -125,8 +156,14 @@ class AmazonPriceReplacer {
                      }
  
                      let [whole, fraction] = dogefy.split('.');
-                     visiblePriceElements[0].textContent = whole + visiblePriceElements[0].querySelector('.a-price-decimal').textContent;
-                     visiblePriceElements[1].textContent = fraction;
+
+               //      let priceDecimalElement = visiblePriceElements[0].querySelector('.a-price-decimal');
+                     visiblePriceElements[0].textContent = whole + ".";
+
+                     if(visiblePriceElements.length > 1) {
+
+                        visiblePriceElements[1].textContent = fraction;
+                     }
                  }
              }
 
@@ -363,9 +400,8 @@ priceReplacers.push(new GenericPriceReplacer());
 
 
 
-
 async function runAllTests() {
-    
+  
     let tests = document.getElementsByClassName("test");
     let mockWindow = {
         location: {
@@ -391,7 +427,7 @@ async function runAllTests() {
             resultElement.classList.add("fail");
         }
 
-        // Add a 2.5-second lag between each test
+        // dramatic pause!
         await new Promise(resolve => setTimeout(resolve, 50));
     }
 

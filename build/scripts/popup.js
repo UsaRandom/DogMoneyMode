@@ -1,1 +1,87 @@
-(()=>{"use strict";let e=new class{constructor(){this.localStorageKey="dmm-app-state"}async setAppState(e){const t={};return t[this.localStorageKey]=e,new Promise(((e,o)=>{chrome.storage.local.set(t,(()=>{if(chrome.runtime.lastError)return o(chrome.runtime.lastError);e()}))}))}async getAppState(){return new Promise(((e,t)=>{chrome.storage.local.get(this.localStorageKey,(o=>{if(chrome.runtime.lastError)return t(chrome.runtime.lastError);e(o[this.localStorageKey]||{dogMoneyModeEnabled:!1,comicSansModeEnabled:!1})}))}))}};!async function(){try{let t=await e.getAppState(),o=document.getElementById("dogmoneymode-toggle"),n=document.getElementById("comicsans-toggle");o.checked=t.dogMoneyModeEnabled,o.addEventListener("change",(function(o){t.dogMoneyModeEnabled=o.target.checked,e.setAppState(t)})),t.comicSansModeEnabled?(n.textContent="so default",n.classList.add("comicsans-on")):(n.textContent="very comic",n.classList.remove("comicsans-on")),n.addEventListener("click",(function(o){t.comicSansModeEnabled=!t.comicSansModeEnabled,t.comicSansModeEnabled?(n.textContent="so default",n.classList.add("comicsans-on")):(n.textContent="very comic",n.classList.remove("comicsans-on")),e.setAppState(t)}))}catch(e){console.error(e)}}()})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+var __webpack_exports__ = {};
+
+;// CONCATENATED MODULE: ./src/AppStateStore.js
+class AppStateStore {
+  constructor() {
+    this.localStorageKey = 'dmm-app-state';
+  }
+
+  async setAppState(stateObj) {
+    const obj = {};
+    obj[this.localStorageKey] = stateObj;
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set(obj, () => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve();
+      });
+    });
+  }
+
+  async getAppState() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(this.localStorageKey, (result) => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve(result[this.localStorageKey] || {"dogMoneyModeEnabled": false, "comicSansModeEnabled": false});
+      });
+    });
+  }
+}
+
+
+
+;// CONCATENATED MODULE: ./src/popup.js
+
+
+let appStateStore = new AppStateStore();
+
+
+
+(async function update() {
+  try {
+    let appState = await appStateStore.getAppState();
+        
+    let dogMoneyModeToggleButton = document.getElementById("dogmoneymode-toggle");
+    let comicSansModeButton = document.getElementById("comicsans-toggle");
+
+    dogMoneyModeToggleButton.checked = appState.dogMoneyModeEnabled;
+    dogMoneyModeToggleButton.addEventListener("change", function(e) {
+      appState.dogMoneyModeEnabled = e.target.checked;
+      appStateStore.setAppState(appState);
+    });
+
+    if(appState.comicSansModeEnabled) {
+      comicSansModeButton.textContent = "so default";
+      comicSansModeButton.classList.add("comicsans-on");
+    } else {
+      comicSansModeButton.textContent = "very comic";
+      comicSansModeButton.classList.remove("comicsans-on");
+    }
+
+    comicSansModeButton.addEventListener("click", function(e) {
+
+      appState.comicSansModeEnabled = !appState.comicSansModeEnabled;
+        
+      if(appState.comicSansModeEnabled) {
+        comicSansModeButton.textContent = "so default";
+        comicSansModeButton.classList.add("comicsans-on");
+      } else {
+        comicSansModeButton.textContent = "very comic";
+        comicSansModeButton.classList.remove("comicsans-on");
+      }
+      
+      appStateStore.setAppState(appState);
+    });
+
+  } catch (error) {
+      console.error(error);
+  }
+})();
+
+/******/ })()
+;

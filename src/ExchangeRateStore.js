@@ -25,11 +25,11 @@ class ExchangeRateStore {
     });
   }
 
-  async getRates() {
+  async getRates(isContentScript = true) {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(this.localStorageKey, async (result) => {
         let storedData = result[this.localStorageKey];
-        if (!storedData || Date.now() - storedData.updatedOn > this.timeToLive) {
+        if (!isContentScript && (!storedData || Date.now() - storedData.updatedOn > this.timeToLive)) {
           try {
             storedData = await this._fetchRates();
           } catch (error) {

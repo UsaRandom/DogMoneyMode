@@ -21,9 +21,8 @@ priceReplacers.push(new GenericPriceReplacer());
 
 
 
-
 async function runAllTests() {
-    
+  
     let tests = document.getElementsByClassName("test");
     let mockWindow = {
         location: {
